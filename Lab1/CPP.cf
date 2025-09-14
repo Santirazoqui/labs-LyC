@@ -5,6 +5,7 @@ DInline.  Def    ::= "inline" Type Id "(" [Arg] ")" "{" [Stm] "}" ;
 DInlineP. Def    ::= "inline" Type Id "(" [Arg] ")" ";" ;
 DProto.   Def    ::= Type Id "(" [Arg] ")" ";" ;
 DDcls.    Def    ::= Type IdList ";" ;
+DStruct.  Def    ::= "struct" Id "{" [Member] "}" ";" ;
 DTypedef. Def    ::= "typedef" Type Id ";" ;
 DUsing.   Def    ::= "using" QName ";" ;
 
@@ -23,6 +24,7 @@ SInit.       Stm ::= Type Id "=" Exp ";" ;
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
+SDoWhile.    Stm ::= "do" Stm "while" "(" Exp ")" ";" ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
 SStruct.     Stm ::= "struct" Id "{" [Member] "}" ";" ;
@@ -32,61 +34,72 @@ terminator Stm "" ;
 MDecl.   Member ::= Type IdList ";" ;
 terminator Member "" ;
 
-ETrue.   Exp15  ::= "true" ;
-EFalse.  Exp15  ::= "false" ;
-EInt.    Exp15  ::= Integer ;
-EDouble. Exp15  ::= Double ;
-EString. Exp15  ::= [String] ;  -- permite salto de líneas
-separator nonempty String "" ;
-EId.     Exp15  ::= QName ;
-ECall.   Exp15  ::= Exp15 "(" [Exp] ")" ;
-EAttr.   Exp15  ::= Exp15 "." Id ;
-EArrow.  Exp15  ::= Exp15 "->" Id ;
-EIndex.  Exp15  ::= Exp15 "[" Exp "]" ;
+ETrue.    Exp15 ::= "true" ;
+EFalse.   Exp15 ::= "false" ;
+EInt.     Exp15 ::= Integer ;
+EDouble.  Exp15 ::= Double ;
+SOne.     StrLit ::= String ;
+SCat.     StrLit ::= StrLit String ;
+EString.  Exp15 ::= StrLit ;
+ECharLt.  Exp15 ::= "'<'" ;
+ECharGt.  Exp15 ::= "'>'" ;
+EId.      Exp15 ::= QName ;
+ECall.    Exp15 ::= Exp15 "(" [Exp] ")" ;
+EAttr.    Exp15 ::= Exp15 "." Id ;
+EArrow.   Exp15 ::= Exp15 "->" Id ;
+EIndex.   Exp15 ::= Exp15 "[" Exp "]" ;
 
-EPIncr.  Exp14  ::= Exp15 "++" ;
-EPDecr.  Exp14  ::= Exp15 "--" ;
+EPIncr.   Exp14 ::= Exp15 "++" ;
+EPDecr.   Exp14 ::= Exp15 "--" ;
 
-EIncr.   Exp13  ::= "++" Exp14 ;
-EDecr.   Exp13  ::= "--" Exp14 ;
+EIncr.    Exp13 ::= "++" Exp14 ;
+EDecr.    Exp13 ::= "--" Exp14 ;
+ENot.     Exp13 ::= "!"  Exp14 ;
+EDeref.   Exp13 ::= "*"  Exp14 ;
 
-ETimes.  Exp12  ::= Exp12 "*"  Exp13 ;
-EDiv.    Exp12  ::= Exp12 "/"  Exp13 ;
-EPlus.   Exp11  ::= Exp11 "+"  Exp12 ;
-EMinus.  Exp11  ::= Exp11 "-"  Exp12 ;
+ETimes.   Exp12 ::= Exp12 "*"  Exp13 ;
+EDiv.     Exp12 ::= Exp12 "/"  Exp13 ;
+EMod.     Exp12 ::= Exp12 "%"  Exp13 ;
+EPlus.    Exp11 ::= Exp11 "+"  Exp12 ;
+EMinus.   Exp11 ::= Exp11 "-"  Exp12 ;
 
-ELShift. Exp10  ::= Exp10 "<<" Exp11 ;
-ERShift. Exp10  ::= Exp10 ">>" Exp11 ;
+ELShift.  Exp10 ::= Exp10 "<<" Exp11 ;
+ERShift.  Exp10 ::= Exp10 ">>" Exp11 ;
 
-ELt.     Exp9   ::= Exp9  "<"  Exp10 ;
-EGt.     Exp9   ::= Exp9  ">"  Exp10 ;
-ELtEq.   Exp9   ::= Exp9  "<=" Exp10 ;
-EGtEq.   Exp9   ::= Exp9  ">=" Exp10 ;
-EEq.     Exp8   ::= Exp8  "==" Exp9 ;
-ENEq.    Exp8   ::= Exp8  "!=" Exp9 ;
-EAnd.    Exp4   ::= Exp4  "&&" Exp5 ;
-EOr.     Exp3   ::= Exp3  "||" Exp4 ;
-EAss.    Exp2   ::= Exp3 "=" Exp2 ;
+ELt.      Exp9  ::= Exp9  "<"  Exp10 ;
+EGt.      Exp9  ::= Exp9  ">"  Exp10 ;
+ELtEq.    Exp9  ::= Exp9  "<=" Exp10 ;
+EGtEq.    Exp9  ::= Exp9  ">=" Exp10 ;
+EEq.      Exp8  ::= Exp8  "==" Exp9 ;
+ENEq.     Exp8  ::= Exp8  "!=" Exp9 ;
+EAnd.     Exp4  ::= Exp4  "&&" Exp5 ;
+EOr.      Exp3  ::= Exp3  "||" Exp4 ;
+ECond.    Exp2  ::= Exp3 "?" Exp ":" Exp2 ;
+EAss.     Exp1  ::= Exp2 "="  Exp1 ;
+EAssAdd.  Exp1  ::= Exp2 "+=" Exp1 ;
+EAssSub.  Exp1  ::= Exp2 "-=" Exp1 ;
 
 internal ETyped. Exp15 ::= "(" Exp ":" Type ")" ;
 coercions Exp 15 ;
 separator Exp "," ;
 
-QId.    QName ::= Id ;
-QQual.  QName ::= Id "::" QName ;
-TemplateInstantiation. TempInst ::= Id "<" [Type] ">" ; -- me agregó un shift/reduce
+QId.        QName ::= Id ;
+QQual.      QName ::= Id "::" QName ;
+QTempl.     QName ::= Id "<" [Type] ">" ;
+QTemplQual. QName ::= Id "<" [Type] ">" "::" QName ;
 
-rules Type3     ::= "bool" | "int" | "double" | "void" | "string" ;
-rules Type2     ::= Type3 | TempInst ;
-rules Type1     ::= Type2 | Type2 "&" ;
-rules Type      ::= Type1 | "const" Type1 ;
+TSimple. SimpleType ::= QName ;
+rules SimpleType   ::= "bool" | "int" | "double" | "void" ;
+
+TId.     Type ::= SimpleType ;
+TConst.  Type ::= "const" SimpleType ;
+
+TRef.    TypeRef ::= Type ;
+TRefAmp. TypeRef ::= Type "&" ;
+
 separator nonempty Type "," ;
 
-TRefBase. TypeRef ::= Type ;
-TRefAmp.  TypeRef ::= Type "&" ;
-
 token Id (letter (letter | digit | '_')*) ;
-
 separator nonempty Id "," ;
 
 ILOne.   IdList ::= Id ;
