@@ -1,0 +1,13 @@
+AbsCPP.*
+PrintCPP.*
+LexCPP.*
+ParCPP.*
+SkelCPP.*
+ErrM.hs
+TestCPP*
+DocCPP.txt
+Makefile
+*.hi
+*.o
+*.log
+*.bak
