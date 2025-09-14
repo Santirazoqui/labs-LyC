@@ -15,6 +15,7 @@ import System.Exit
 import System.IO
 import System.Process
 import System.IO.Unsafe
+import System.Info (os)
 
 {-# NOINLINE doDebug #-}
 doDebug :: IORef Bool
@@ -82,7 +83,8 @@ runTests =
 testFrontendProg :: Bool -> FilePath -> IO Bool
 testFrontendProg good f =
     do let bad = not good
-           c = "./testdriver " ++ f
+           exe = if isWindows then "testdriver" else "./testdriver"
+           c = exe ++ " " ++ f
        putStrLn $ "Parsing " ++ f ++ "..."
        (out,err,s) <- runCommandStrWait c ""
        case lines err of
@@ -335,3 +337,7 @@ report n rs =
          c = if p == t then green else red
      putStrLn $ color c $ 
               n ++ "passed " ++ show p ++ " of " ++ show t ++ " tests"
+
+
+isWindows :: Bool
+isWindows = os == "mingw32" || os == "cygwin" || os == "windows"

@@ -1,10 +1,11 @@
 PDefs.   Program ::= [Def] ;
-rules Body ::= "{" [Stm] "}" | ";" ;
 
-DFun.    Def    ::= Type Id "(" [Arg] ")" Body ;
-DInlineFun. Def    ::= "inline" Type Id "(" [Arg] ")" Body ;
+DFun.     Def    ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+DInline.  Def    ::= "inline" Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+DInlineP. Def    ::= "inline" Type Id "(" [Arg] ")" ";" ;
+DProto.   Def    ::= Type Id "(" [Arg] ")" ";" ;
+
 terminator Def "" ;
-
 
 AEmptyDecl.     Arg    ::= Type ;
 ADecl.          Arg    ::= Type Id ;
@@ -66,7 +67,6 @@ separator Exp "," ;
 
 --template instantiation
 TemplateInstantiation. TempInst ::= Id "<" [Type] ">" ; --me agrego un shift/reduce
-
 
 rules Type3     ::= "bool" | "int" | "double" | "void" | "string" ;
 rules Type2     ::= Type3 | TempInst ;
