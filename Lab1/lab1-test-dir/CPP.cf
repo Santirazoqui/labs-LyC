@@ -7,9 +7,9 @@ DProto.   Def    ::= Type Id "(" [Arg] ")" ";" ;
 
 terminator Def "" ;
 
-AEmptyDecl.     Arg    ::= Type ;
-ADecl.          Arg    ::= Type Id ;
-ADeclInit.      Arg    ::= Type Id "=" Exp ;
+ARaw.       Arg    ::= TypeRef ;
+AWithId.    Arg    ::= TypeRef Id ;
+AWithInit.  Arg    ::= TypeRef Id "=" Exp ;
 
 separator Arg "," ;
 
@@ -72,6 +72,10 @@ rules Type3     ::= "bool" | "int" | "double" | "void" | "string" ;
 rules Type2     ::= Type3 | TempInst ;
 rules Type1     ::= Type2 | Type2 "&" ;
 rules Type      ::= Type1 | "const" Type1 ;
+
+TRefBase. TypeRef ::= Type ;
+TRefAmp.  TypeRef ::= Type "&" ;
+
 separator nonempty Type "," ;
 
 token Id (letter (letter | digit | '_')*) ;
