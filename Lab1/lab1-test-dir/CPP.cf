@@ -8,26 +8,33 @@ DDcls.    Def    ::= Type IdList ";" ;
 DStruct.  Def    ::= "struct" Id "{" [Member] "}" ";" ;
 DTypedef. Def    ::= "typedef" Type Id ";" ;
 DUsing.   Def    ::= "using" QName ";" ;
+DDeclAny. Def    ::= TypeRef ListDItem ";" ;
 
 terminator Def "" ;
 
 ARaw.       Arg    ::= TypeRef ;
 AWithId.    Arg    ::= TypeRef Id ;
 AWithInit.  Arg    ::= TypeRef Id "=" Exp ;
-
 separator Arg "," ;
+
+DItemInit. DItem ::= Id "=" Exp ;
+DItemId.   DItem ::= Id ;
+LDeclOne.  ListDItem ::= DItem ;
+LDeclMore. ListDItem ::= DItem "," ListDItem ;
 
 SEmpty.      Stm ::= ";" ;
 SExp.        Stm ::= Exp ";" ;
-SDecls.      Stm ::= Type [Id] ";" ;
-SInit.       Stm ::= Type Id "=" Exp ";" ;
+SDeclAny.    Stm ::= TypeRef ListDItem ";" ;
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
 SDoWhile.    Stm ::= "do" Stm "while" "(" Exp ")" ";" ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
+SIf.         Stm ::= "if" "(" Exp ")" Stm ;
 SStruct.     Stm ::= "struct" Id "{" [Member] "}" ";" ;
+SFor.        Stm ::= "for" "(" ForInit Exp ";" Exp ")" Stm ;
+FInitAny.    ForInit ::= TypeRef ListDItem ";" ;
 
 terminator Stm "" ;
 
