@@ -69,7 +69,7 @@ gen_aux(const Grammar& g, const string& word, vector<string>& ret)
 		ret.push_back(word);
 	} else {
 		// locate the rule that corresponds to `word'
-		Grammar::const_iterator it = g.find(word);
+		const_iterator it = g.find(word);
 		if (it == g.end())
 			throw logic_error("empty rule");
 
@@ -80,7 +80,7 @@ gen_aux(const Grammar& g, const string& word, vector<string>& ret)
 		const Rule& r = c[nrand(c.size())];
 
 		// recursively expand the selected rule
-		for (Rule::const_iterator i = r.begin(); i != r.end(); ++i)
+		for (const_iterator i = r.begin(); i != r.end(); ++i)
 			gen_aux(g, *i, ret);
 	}
 }
@@ -92,9 +92,9 @@ int main()
 
 	// write the first word, if any
 #ifdef _MSC_VER
-	std::vector<string>::const_iterator it = sentence.begin();
+	const_iterator it = sentence.begin();
 #else
-	vector<string>::const_iterator it = sentence.begin();
+	const_iterator it = sentence.begin();
 #endif
 	if (!sentence.empty()) {
 		cout << *it;

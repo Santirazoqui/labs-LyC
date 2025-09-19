@@ -7,7 +7,6 @@ DProto.   Def    ::= Type Id "(" [Arg] ")" ";" ;
 DDcls.    Def    ::= Type IdList ";" ;
 DStruct.  Def    ::= "struct" Id "{" [Member] "}" ";" ;
 DTypedef. Def    ::= "typedef" Type Id ";" ;
-DUsing.   Def    ::= "using" QName ";" ;
 DDeclAny. Def    ::= TypeRef ListDItem ";" ;
 
 terminator Def "" ;
@@ -28,45 +27,49 @@ SDeclAny.    Stm ::= TypeRef ListDItem ";" ;
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
-SDoWhile.    Stm ::= "do" Stm "while" "(" Exp ")" ";" ;
+SDoWhile.    Stm ::= "do" Stm "while" "(" Exp ")" ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
 SIf.         Stm ::= "if" "(" Exp ")" Stm ;
 SStruct.     Stm ::= "struct" Id "{" [Member] "}" ";" ;
 SFor.        Stm ::= "for" "(" ForInit Exp ";" Exp ")" Stm ;
+SForInit.    Stm ::= "for" "(" Exp3 "=" Exp2 ";" Exp ";" Exp ")" Stm ;
 FInitAny.    ForInit ::= TypeRef ListDItem ";" ;
-
 terminator Stm "" ;
 
 MDecl.   Member ::= Type IdList ";" ;
 terminator Member "" ;
 
-ETrue.    Exp15 ::= "true" ;
-EFalse.   Exp15 ::= "false" ;
-EInt.     Exp15 ::= Integer ;
-EDouble.  Exp15 ::= Double ;
+ETrue.    Exp16 ::= "true" ;
+EFalse.   Exp16 ::= "false" ;
+EInt.     Exp16 ::= Integer ;
+EDouble.  Exp16 ::= Double ;
+EString.  Exp16 ::= StrLit ;
+EChar.   Exp16  ::= Char ;
 SOne.     StrLit ::= String ;
 SCat.     StrLit ::= StrLit String ;
-EString.  Exp15 ::= StrLit ;
-ECharLt.  Exp15 ::= "'<'" ;
-ECharGt.  Exp15 ::= "'>'" ;
-EId.      Exp15 ::= QName ;
+--ECharLt.  Exp15 ::= "'<'" ;
+--ECharGt.  Exp15 ::= "'>'" ; No hay chance que esto este bien
+EId.      Exp16 ::= QName ;
+
 ECall.    Exp15 ::= Exp15 "(" [Exp] ")" ;
-EAttr.    Exp15 ::= Exp15 "." Id ;
-EArrow.   Exp15 ::= Exp15 "->" Id ;
 EIndex.   Exp15 ::= Exp15 "[" Exp "]" ;
 
+
+EAttr.    Exp14 ::= Exp14 "." Exp15 ;
+EArrow.   Exp14 ::= Exp14 "->" Exp15 ;
 EPIncr.   Exp14 ::= Exp15 "++" ;
 EPDecr.   Exp14 ::= Exp15 "--" ;
+EDeref.   Exp14 ::= "*"  Exp15 ;
 
 EIncr.    Exp13 ::= "++" Exp14 ;
 EDecr.    Exp13 ::= "--" Exp14 ;
 ENot.     Exp13 ::= "!"  Exp14 ;
-EDeref.   Exp13 ::= "*"  Exp14 ;
 
 ETimes.   Exp12 ::= Exp12 "*"  Exp13 ;
 EDiv.     Exp12 ::= Exp12 "/"  Exp13 ;
 EMod.     Exp12 ::= Exp12 "%"  Exp13 ;
+
 EPlus.    Exp11 ::= Exp11 "+"  Exp12 ;
 EMinus.   Exp11 ::= Exp11 "-"  Exp12 ;
 
@@ -85,24 +88,24 @@ ECond.    Exp2  ::= Exp3 "?" Exp ":" Exp2 ;
 EAss.     Exp1  ::= Exp2 "="  Exp1 ;
 EAssAdd.  Exp1  ::= Exp2 "+=" Exp1 ;
 EAssSub.  Exp1  ::= Exp2 "-=" Exp1 ;
+EThrow.  Exp1   ::= "throw" Exp2 ;
 
-internal ETyped. Exp15 ::= "(" Exp ":" Type ")" ;
-coercions Exp 15 ;
+internal ETyped. Exp16 ::= "(" Exp ":" Type ")" ;
+coercions Exp 16 ;
 separator Exp "," ;
 
 QId.        QName ::= Id ;
-QQual.      QName ::= Id "::" QName ;
+--QQual.      QName ::= Id "::" QName ;
 QTempl.     QName ::= Id "<" [Type] ">" ;
-QTemplQual. QName ::= Id "<" [Type] ">" "::" QName ;
+--QTemplQual. QName ::= Id "<" [Type] ">" "::" QName ;
 
-TSimple. SimpleType ::= QName ;
-rules SimpleType   ::= "bool" | "int" | "double" | "void" ;
+rules ConstantName ::= QName ;
+rules PrimitiveType   ::= "bool" | "int" | "double" | "void" ;
 
-TId.     Type ::= SimpleType ;
-TConst.  Type ::= "const" SimpleType ;
+rules SimpleType ::= ConstantName | PrimitiveType ;
 
-TRef.    TypeRef ::= Type ;
-TRefAmp. TypeRef ::= Type "&" ;
+rules  Type ::= SimpleType | "const" SimpleType ;
+rules   TypeRef ::= Type | Type "&" ;
 
 separator nonempty Type "," ;
 
@@ -115,3 +118,4 @@ ILMore.  IdList ::= Id "," IdList ;
 comment "#" ;
 comment "//" ;
 comment "/*" "*/" ;
+comment "using" ;
